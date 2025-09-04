@@ -6,4 +6,8 @@ const router = express.Router();
 
 router.use('/v1', v1Router);
 
+// Backward compatibility: also mount v1 routes at root
+// This lets frontends using baseURL '/api' (without '/v1') keep working
+router.use('/', v1Router);
+
 export default router;

@@ -1,5 +1,6 @@
 import { StatusCodes } from 'http-status-codes';
 
+import { createWorkspaceInviteService } from '../services/dmService.js';
 import { verifyTokenService } from '../services/userService.js';
 import {
   addChannelToWorkspaceService,
@@ -66,7 +67,7 @@ export const deleteWorkspaceController = async (req, res) => {
     );
     return res
       .status(StatusCodes.OK)
-      .json(successResponse(response, 'Workspace deleted successfully'));
+      .json(successResponse(response, 'Workspace fetched successfully'));
   } catch (error) {
     console.log(error);
     if (error.statusCode) {
@@ -229,6 +230,25 @@ export const joinWorkspaceController = async (req, res) => {
       return res.status(error.statusCode).json(customErrorResponse(error));
     }
 
+    return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json(internalErrorResponse(error));
+  }
+};
+
+export const createWorkspaceInviteController = async (req, res) => {
+  try {
+    const { workspaceId } = req.params;
+    const { email } = req.body;
+    const invite = await createWorkspaceInviteService(workspaceId, req.user, email);
+    return res
+      .status(StatusCodes.OK)
+      .json(successResponse(invite, 'Workspace invite sent'));
+  } catch (error) {
+    console.log('createWorkspaceInviteController error', error);
+    if (error.statusCode) {
+      return res.status(error.statusCode).json(customErrorResponse(error));
+    }
     return res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
       .json(internalErrorResponse(error));

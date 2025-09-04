@@ -1,7 +1,8 @@
+import fs from 'fs/promises';
 import { StatusCodes } from 'http-status-codes';
 
-import { s3 } from '../config/awsConfig.js';
-import { AWS_BUCKET_NAME } from '../config/serverConfig.js';
+import cloudinary from '../config/cloudinary.js';
+import { CLOUDINARY_FOLDER } from '../config/serverConfig.js';
 import { getMessagesService } from '../services/messageService.js';
 import {
   customErrorResponse,
@@ -35,24 +36,34 @@ export const getMessages = async (req, res) => {
   }
 };
 
-export const getPresignedUrlFromAWS = async (req, res) => {
+export const uploadToCloudinary = async (req, res) => {
   try {
-    const url = await s3.getSignedUrlPromise('putObject', {
-      Bucket: AWS_BUCKET_NAME,
-      Key: `${Date.now()}`,
-      Expires: 60 // 1 minute
-    });
-    return res
-          .status(StatusCodes.OK)
-          .json(successResponse(url, 'Presigned URL generated successfully'));
-          
-  } catch (err) {
-    console.log('Error in getPresignedUrlFromAWS', err);
-    if(err.statusCode) {
-      return res.status(err.statusCode).json(customErrorResponse(err));
+    if (!req.file) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json(customErrorResponse({ message: 'No file provided' }));
+    }
+
+    const filePath = req.file.path;
+    try {
+      const result = await cloudinary.uploader.upload(filePath, {
+        folder: CLOUDINARY_FOLDER || 'chatgrid'
+      });
+      await fs.unlink(filePath).catch(() => {});
+      return res
+        .status(StatusCodes.OK)
+        .json(successResponse({ url: result.secure_url }, 'File uploaded successfully'));
+    } catch (err) {
+      await fs.unlink(filePath).catch(() => {});
+      throw err;
+    }
+  } catch (error) {
+    console.log('Error in uploadToCloudinary', error);
+    if (error.statusCode) {
+      return res.status(error.statusCode).json(customErrorResponse(error));
     }
     return res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json(internalErrorResponse(err));
+      .json(internalErrorResponse(error));
   }
-}
+};

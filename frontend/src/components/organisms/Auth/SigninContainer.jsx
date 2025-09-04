@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useSignin } from '@/hooks/apis/auth/useSignin';
+import { useAuth } from '@/hooks/context/useAuth';
 
 import { SigninCard } from './SigninCard';
 
@@ -17,6 +18,7 @@ export const SigninContainer = () => {
     });
 
     const { isSuccess, isPending, error, signinMutation } = useSignin();
+    const { auth } = useAuth();
 
     const onSigninFormSubmit = async (e) => {
         e.preventDefault();
@@ -34,13 +36,10 @@ export const SigninContainer = () => {
     };
 
     useEffect(() => {
-        if(isSuccess) {
-            setTimeout(() => {
-                navigate('/home');
-            }, 3000);
+        if (isSuccess || (auth?.user && auth?.token)) {
+            navigate('/home', { replace: true });
         }
-            
-    }, [isSuccess, navigate]);
+    }, [isSuccess, auth?.user, auth?.token, navigate]);
 
     return (
         <SigninCard 

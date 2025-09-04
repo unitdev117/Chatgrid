@@ -10,7 +10,17 @@ const channelSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Workspace',
       required: [true, 'Workspace ID is required']
-    }
+    },
+    isDM: {
+      type: Boolean,
+      default: false
+    },
+    members: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+      }
+    ]
   },
 
   { timestamps: true }

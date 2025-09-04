@@ -42,10 +42,18 @@ export const getChannelByIdService = async (channelId, userId) => {
 
     console.log('Channel in service', channel);
 
+    let displayName = channel.name;
+    if (channel.isDM && Array.isArray(channel.members)) {
+      const other = channel.members.find((m) => m._id.toString() !== userId.toString());
+      if (other && other.username) displayName = other.username;
+    }
+
     return {
       messages,
       _id: channel._id,
-      name: channel.name,
+      name: displayName,
+      isDM: !!channel.isDM,
+      members: channel.members,
       createdAt: channel.createdAt,
       updatedAt: channel.updatedAt,
       workspaceId: channel.workspaceId

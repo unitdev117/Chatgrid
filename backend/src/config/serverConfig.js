@@ -27,18 +27,15 @@ export const APP_LINK = process.env.APP_LINK || 'http://localhost:3000';
 export const ENABLE_EMAIL_VERIFICATION =
   process.env.ENABLE_EMAIL_VERIFICATION || false;
 
-export const AWS_REGION = process.env.AWS_REGION;
-
-export const AWS_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID;
-
-export const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY;
-
-export const AWS_BUCKET_NAME = process.env.AWS_BUCKET_NAME;
-
-export const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;
-
-export const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID;
-
 export const CURRENCY = process.env.CURRENCY || 'INR';
 
 export const RECEIPT_SECRET = process.env.RECEIPT_SECRET || 'receipt_1103';
+
+// Cloudinary
+export const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;
+export const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY;
+export const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET;
+export const CLOUDINARY_FOLDER = process.env.CLOUDINARY_FOLDER;
+
+// Multer temp dir (optional override)
+export const TEMP_UPLOAD_DIR = process.env.TEMP_UPLOAD_DIR;

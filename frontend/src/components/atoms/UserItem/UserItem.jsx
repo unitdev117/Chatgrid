@@ -24,7 +24,9 @@ export const UserItem = ({
     id,
     label = 'Member',
     image,
-    variant
+    variant,
+    to,
+    onClick
 }) => {
     console.log('incoming label', label);
     const { workspace } = useCurrentWorkspace();
@@ -34,21 +36,34 @@ export const UserItem = ({
             className={cn(userItemVariants({variant}))}
             variant="transparent"
             size="sm"
-            asChild
+            asChild={!!to}
+            onClick={onClick}
         >
-            <Link to={`/workspace/${workspace?._id}/members/${id}`}>
-                <Avatar>
-                    <AvatarImage src={image} className='rounded-md' />
-                    <AvatarFallback
-                        className='rounded-md bg-sky-500 text-white'
-                    >
-                        {label.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                </Avatar>
-                <span className='text-sm truncate'>
-                    {label}
-                </span>
-            </Link>
+            {to ? (
+                <Link to={to}> 
+                    <Avatar>
+                        <AvatarImage src={image} className='rounded-md' />
+                        <AvatarFallback
+                            className='rounded-md bg-sky-500 text-white'
+                        >
+                            {label.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                    </Avatar>
+                    <span className='text-sm truncate'>
+                        {label}
+                    </span>
+                </Link>
+            ) : (
+                <div className='flex items-center gap-1.5'>
+                    <Avatar>
+                        <AvatarImage src={image} className='rounded-md' />
+                        <AvatarFallback className='rounded-md bg-sky-500 text-white'>
+                            {label.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                    </Avatar>
+                    <span className='text-sm truncate'>{label}</span>
+                </div>
+            )}
         </Button>
     );
 };

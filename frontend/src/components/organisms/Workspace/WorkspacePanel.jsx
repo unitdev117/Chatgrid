@@ -1,4 +1,4 @@
-import { AlertTriangleIcon, HashIcon, Loader, MessageSquareTextIcon, SendHorizonalIcon } from 'lucide-react';
+import { AlertTriangleIcon, HashIcon, Loader, MessageSquareTextIcon } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 
 import { SideBarItem } from '@/components/atoms/SideBarItem/SideBarItem';
@@ -7,6 +7,7 @@ import { WorkspacePanelHeader } from '@/components/molecules/Workspace/Workspace
 import { WorkspacePanelSection } from '@/components/molecules/Workspace/WorkspacePanelSection';
 import { useGetWorkspaceById } from '@/hooks/apis/workspaces/useGetWorkspaceById';
 import { useCreateChannelModal } from '@/hooks/context/useCreateChannelModal';
+import { useOpenDM } from '@/hooks/apis/dms/useOpenDM';
 
 export const WorkspacePanel = () => {
 
@@ -14,6 +15,9 @@ export const WorkspacePanel = () => {
 
     const { setOpenCreateChannelModal } = useCreateChannelModal();
     const { workspace, isFetching, isSuccess } = useGetWorkspaceById(workspaceId);
+    const { openDM } = useOpenDM();
+    
+    const generalChannelId = workspace?.channels?.find((c) => c.name?.toLowerCase() === 'general')?._id || workspace?.channels?.[0]?._id;
 
     if(isFetching) {
 
@@ -43,20 +47,12 @@ export const WorkspacePanel = () => {
         >
             <WorkspacePanelHeader workspace={workspace} />
 
-            <div
-                className='flex flex-col px-2 mt-3'
-            >
+            <div className='flex flex-col px-2 mt-3'>
                 <SideBarItem 
                     label="Threads"
                     icon={MessageSquareTextIcon}
                     id="threads"
                     variant='active'
-                />
-                <SideBarItem 
-                    label="Drafts & Sends"
-                    icon={SendHorizonalIcon}
-                    id="drafts"
-                    variant='default'
                 />
             </div>
 
@@ -74,8 +70,18 @@ export const WorkspacePanel = () => {
                 onIconClick={() => {}}
             >
                 {workspace?.members?.map((item) => {
-                    return <UserItem key={item.memberId._id} label={item.memberId.username} id={item.memberId._id} image={item.memberId.avatar} />;
+                    return (
+                        <UserItem
+                            key={item.memberId._id}
+                            label={item.memberId.username}
+                            id={item.memberId._id}
+                            image={item.memberId.avatar}
+                            onClick={() => openDM(item.memberId._id)}
+                        />
+                    );
                 })}
+
+                
             </WorkspacePanelSection>
         </div>
     );

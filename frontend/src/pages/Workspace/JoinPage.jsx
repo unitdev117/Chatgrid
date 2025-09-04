@@ -1,4 +1,5 @@
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useEffect } from 'react';
 import VerificationInput from 'react-verification-input';
 
 import { Button } from '@/components/ui/button';
@@ -8,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 export const JoinPage = () => {
 
     const { workspaceId } = useParams();
+    const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const { toast } = useToast();
 
@@ -28,6 +30,17 @@ export const JoinPage = () => {
             console.log('Error in adding member to workspace', error);
         }
     }
+
+    // Auto-join if joinCode provided in URL
+    const autoJoin = searchParams.get('autoJoin');
+    const codeFromLink = searchParams.get('joinCode');
+    
+    useEffect(() => {
+        if (autoJoin === 'true' && codeFromLink) {
+            handleAddMemberToWorkspace(codeFromLink);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [autoJoin, codeFromLink]);
 
     return (
         <div

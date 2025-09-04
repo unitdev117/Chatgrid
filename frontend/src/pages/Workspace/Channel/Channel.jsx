@@ -10,6 +10,7 @@ import { useGetChannelById } from '@/hooks/apis/channels/useGetChannelById';
 import { useGetChannelMessages } from '@/hooks/apis/channels/useGetChannelMessages';
 import { useChannelMessages } from '@/hooks/context/useChannelMessages';
 import { useSocket } from '@/hooks/context/useSocket';
+import { useAuth } from '@/hooks/context/useAuth';
 
 export const Channel = () => {
 
@@ -18,6 +19,7 @@ export const Channel = () => {
     const queryClient = useQueryClient();
 
     const { channelDetails, isFetching, isError } = useGetChannelById(channelId);
+    const { auth } = useAuth();
     const { setMessageList, messageList } = useChannelMessages();
 
     const { joinChannel } = useSocket();
@@ -71,9 +73,17 @@ export const Channel = () => {
         );
     }
 
+    const displayName = (() => {
+        if (channelDetails?.isDM && Array.isArray(channelDetails?.members)) {
+            const other = channelDetails.members.find(m => m._id !== auth?.user?._id);
+            return other?.username || channelDetails?.name;
+        }
+        return channelDetails?.name;
+    })();
+
     return (
         <div className='flex flex-col h-full'>
-            <ChannelHeader name={channelDetails?.name} />
+            <ChannelHeader name={displayName} isDM={channelDetails?.isDM} />
 
             {/* We need to make sure that below div is scrollable for the messages */}
             <div

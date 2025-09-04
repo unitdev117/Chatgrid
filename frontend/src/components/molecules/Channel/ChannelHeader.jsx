@@ -3,7 +3,7 @@ import { FaChevronDown } from 'react-icons/fa';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
-export const ChannelHeader = ({ name }) => {
+export const ChannelHeader = ({ name, isDM }) => {
     return (
         <div
             className="bg-white border-b h-[50px] flex items-center px-4 overflow-hidden"
@@ -14,14 +14,14 @@ export const ChannelHeader = ({ name }) => {
                         variant="ghost"
                         className="text-lg font-semibold px-2 w-auto overflow-hidden"
                     >
-                        <span># {name} </span>
+                        <span>{isDM ? '' : '# '}{name} </span>
                         <FaChevronDown className='size-3 ml-2' />
                     </Button>
                 </DialogTrigger>
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>
-                            # {name}
+                            {isDM ? '' : '# '}{name}
                         </DialogTitle>
 
                     </DialogHeader>

@@ -1,6 +1,6 @@
 import { InfoIcon, LucideLoader2, SearchIcon } from 'lucide-react';
 import { useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
 import { useGetWorkspaceById } from '@/hooks/apis/workspaces/useGetWorkspaceById';
@@ -13,11 +13,14 @@ export const WorkspaceNavbar = () => {
 
     const navigate = useNavigate();
     const { logout } = useAuth();
-    const { isFetching, workspace, error, isSuccess } = useGetWorkspaceById(workspaceId);
+    const location = useLocation();
+    const onNotifications = /\/workspaces\/[^/]+\/notifications\/?$/.test(location.pathname);
+    const { isFetching, workspace, error, isSuccess } = useGetWorkspaceById(workspaceId, { enabled: !onNotifications });
     const { setCurrentWorkspace } = useCurrentWorkspace();
 
     useEffect(() => {
         
+        if(onNotifications) return; // don't force logout on notifications view
         if(!isFetching && !isSuccess && error) {
             console.log('Error fetching workspace', error.status);
             if(error.status === 403) {

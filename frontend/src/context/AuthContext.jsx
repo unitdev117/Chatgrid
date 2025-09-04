@@ -10,22 +10,38 @@ export const AuthContextProvider = ({ children }) => {
         isLoading: true
     });
 
-    useEffect(() => {
-        const user = localStorage.getItem('user');
-        const token = localStorage.getItem('token');
-        if(user && token) {
-            setAuth({
-                user: JSON.parse(user),
-                token,
-                isLoading: false
-            });
-        } else {
-            setAuth({
-                user: null,
-                token: null,
-                isLoading: false
-            });
+    function isTokenExpired(jwt) {
+        try {
+            const [, payload] = jwt.split('.');
+            const decoded = JSON.parse(atob(payload));
+            if (!decoded.exp) return false;
+            const nowSec = Math.floor(Date.now() / 1000);
+            return decoded.exp <= nowSec;
+        } catch {
+            return true;
         }
+    }
+
+    function applyAuthFromStorage() {
+        const userStr = localStorage.getItem('user');
+        const token = localStorage.getItem('token');
+        if (userStr && token && !isTokenExpired(token)) {
+            setAuth({ user: JSON.parse(userStr), token, isLoading: false });
+        } else {
+            // purge invalid/expired
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+            setAuth({ user: null, token: null, isLoading: false });
+        }
+    }
+
+    useEffect(() => {
+        applyAuthFromStorage();
+        const onStorage = (e) => {
+            if (e.key === 'token' || e.key === 'user') applyAuthFromStorage();
+        };
+        window.addEventListener('storage', onStorage);
+        return () => window.removeEventListener('storage', onStorage);
     } , []);
 
     async function logout() {

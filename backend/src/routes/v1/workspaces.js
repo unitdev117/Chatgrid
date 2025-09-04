@@ -4,14 +4,14 @@ import {
   addChannelToWorkspaceController,
   addMemberToWorkspaceController,
   createWorkspaceController,
+  createWorkspaceInviteController,
   deleteWorkspaceController,
   getWorkspaceByJoinCodeController,
   getWorkspaceController,
   getWorkspacesUserIsMemberOfController,
   joinWorkspaceController,
   resetJoinCodeController,
-  updateWorkspaceController
-} from '../../controllers/workspaceController.js';
+  updateWorkspaceController} from '../../controllers/workspaceController.js';
 import { isAuthenticated } from '../../middlewares/authMiddleware.js';
 import {
   addChannelToWorkspaceSchema,
@@ -64,5 +64,13 @@ router.put(
   isAuthenticated,
   resetJoinCodeController
 );
+
+router.post(
+  '/:workspaceId/invite-email',
+  isAuthenticated,
+  createWorkspaceInviteController
+);
+
+ 
 
 export default router;

@@ -132,3 +132,31 @@ export const joinWorkspaceRequest = async ({ workspaceId, joinCode, token }) => 
         throw error.response.data;
     }
 };
+
+export const inviteWorkspaceByEmail = async ({ workspaceId, email, token }) => {
+  try {
+    const response = await axios.post(`/workspaces/${workspaceId}/invite-email`, { email }, {
+      headers: {
+        'x-access-token': token
+      }
+    });
+    return response?.data?.data;
+  } catch (error) {
+    console.log('Error sending workspace invite', error);
+    throw error?.response || error;
+  }
+};
+
+export const deleteWorkspaceMember = async ({ workspaceId, memberId, token }) => {
+  try {
+    const response = await axios.delete(`/workspaces/${workspaceId}/members/${memberId}`, {
+      headers: {
+        'x-access-token': token
+      }
+    });
+    return response?.data?.data;
+  } catch (error) {
+    console.log('Error removing workspace member', error);
+    throw error?.response || error;
+  }
+};
