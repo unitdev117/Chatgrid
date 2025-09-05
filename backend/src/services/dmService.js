@@ -9,6 +9,13 @@ import { isUserMemberOfWorkspace } from './workspaceService.js';
 
 export const createOrGetDMService = async (workspaceId, currentUserId, memberId) => {
   try {
+    if (currentUserId?.toString() === memberId?.toString()) {
+      throw new ClientError({
+        message: 'Cannot start a DM with yourself',
+        explanation: 'Invalid data sent from the client',
+        statusCode: StatusCodes.BAD_REQUEST
+      });
+    }
     const workspace = await workspaceRepository.getWorkspaceDetailsById(workspaceId);
     if (!workspace) {
       throw new ClientError({

@@ -9,6 +9,8 @@ import connectDB from './config/dbConfig.js';
 import { PORT } from './config/serverConfig.js';
 import ChannelSocketHandlers from './controllers/channelSocketController.js';
 import MessageSocketHandlers from './controllers/messageSocketController.js';
+import WorkspaceSocketHandlers from './controllers/workspaceSocketController.js';
+import { setIO } from './utils/socketEmitter.js';
 import { verifyEmailController } from './controllers/workspaceController.js';
 import apiRouter from './routes/apiRoutes.js';
 
@@ -19,6 +21,7 @@ const io = new Server(server, {
     origin: '*'
   }
 });
+setIO(io);
 
 app.use(cors());
 
@@ -45,6 +48,7 @@ io.on('connection', (socket) => {
   // });
   MessageSocketHandlers(io, socket);
   ChannelSocketHandlers(io, socket);
+  WorkspaceSocketHandlers(io, socket);
 });
 
 server.listen(PORT, async () => {

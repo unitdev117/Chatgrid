@@ -11,6 +11,9 @@ export const useOpenDM = () => {
 
   const { mutateAsync: openDM, isPending, error } = useMutation({
     mutationFn: async (memberId) => {
+      if (memberId === auth?.user?._id) {
+        throw new Error('Cannot open a DM with yourself');
+      }
       const channel = await createOrGetDM({
         token: auth?.token,
         workspaceId,
@@ -27,4 +30,3 @@ export const useOpenDM = () => {
 
   return { openDM, isPending, error };
 };
-

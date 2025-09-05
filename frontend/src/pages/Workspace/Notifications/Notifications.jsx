@@ -52,7 +52,7 @@ export const Notifications = () => {
             </div>
             <div className='flex gap-2'>
               <Button size='sm' onClick={() => actOnInvite({ inviteId: inv._id, action: 'accept' })}>Accept</Button>
-              <Button size='sm' variant='outline'  onClick={() => actOnInvite({ inviteId: inv._id, action: 'reject' })}>Reject</Button>
+              <Button size='sm' variant='destructive' onClick={() => actOnInvite({ inviteId: inv._id, action: 'reject' })}>Reject</Button>
             </div>
           </div>
         ))}

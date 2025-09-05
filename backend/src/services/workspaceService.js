@@ -6,6 +6,8 @@ import channelRepository from '../repositories/channelRepostiory.js';
 import userRepository from '../repositories/userRepository.js';
 import workspaceRepository from '../repositories/workspaceRepository.js';
 import { workspaceJoinMail } from '../utils/common/mailObject.js';
+import { getIO } from '../utils/socketEmitter.js';
+import { WORKSPACE_UPDATED_EVENT } from '../utils/common/eventConstants.js';
 import ClientError from '../utils/errors/clientError.js';
 import ValidationError from '../utils/errors/validationError.js';
 
@@ -271,6 +273,14 @@ export const addMemberToWorkspaceService = async (
       ...workspaceJoinMail(workspace),
       to: isValidUser.email
     });
+    try {
+      const io = getIO();
+      io?.to(workspaceId).emit(WORKSPACE_UPDATED_EVENT, {
+        workspaceId,
+        type: 'member-added',
+        memberId
+      });
+    } catch {}
     return response;
   } catch (error) {
     console.log('addMemberToWorkspaceService error', error);
@@ -351,7 +361,14 @@ export const joinWorkspaceService = async (workspaceId, joinCode, userId) => {
       userId,
       'member'
     );
-
+    try {
+      const io = getIO();
+      io?.to(workspaceId).emit(WORKSPACE_UPDATED_EVENT, {
+        workspaceId,
+        type: 'member-added',
+        memberId: userId
+      });
+    } catch {}
     return updatedWorkspace;
   } catch (error) {
     console.log('joinWorkspaceService error', error);

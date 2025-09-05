@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { useSignin } from '@/hooks/apis/auth/useSignin';
 import { useAuth } from '@/hooks/context/useAuth';
+import { joinWorkspaceRequest } from '@/apis/workspaces';
 
 import { SigninCard } from './SigninCard';
 
@@ -36,8 +37,29 @@ export const SigninContainer = () => {
     };
 
     useEffect(() => {
-        if (isSuccess || (auth?.user && auth?.token)) {
+        async function postLoginJoinIfNeeded() {
+            const token = auth?.token;
+            if (!token) return;
+            let pending = null;
+            try {
+                const raw = localStorage.getItem('pendingWorkspaceJoin');
+                pending = raw ? JSON.parse(raw) : null;
+            } catch {}
+            if (pending?.workspaceId && pending?.joinCode) {
+                try {
+                    await joinWorkspaceRequest({ workspaceId: pending.workspaceId, joinCode: pending.joinCode, token });
+                    localStorage.removeItem('pendingWorkspaceJoin');
+                    navigate(`/workspaces/${pending.workspaceId}`, { replace: true });
+                    return;
+                } catch (e) {
+                    // fall back to home if join fails
+                    localStorage.removeItem('pendingWorkspaceJoin');
+                }
+            }
             navigate('/home', { replace: true });
+        }
+        if (isSuccess || (auth?.user && auth?.token)) {
+            postLoginJoinIfNeeded();
         }
     }, [isSuccess, auth?.user, auth?.token, navigate]);
 

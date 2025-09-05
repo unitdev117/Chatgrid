@@ -7,6 +7,7 @@ import { WorkspacePanelHeader } from '@/components/molecules/Workspace/Workspace
 import { WorkspacePanelSection } from '@/components/molecules/Workspace/WorkspacePanelSection';
 import { useGetWorkspaceById } from '@/hooks/apis/workspaces/useGetWorkspaceById';
 import { useCreateChannelModal } from '@/hooks/context/useCreateChannelModal';
+import { useAuth } from '@/hooks/context/useAuth';
 import { useOpenDM } from '@/hooks/apis/dms/useOpenDM';
 
 export const WorkspacePanel = () => {
@@ -16,6 +17,7 @@ export const WorkspacePanel = () => {
     const { setOpenCreateChannelModal } = useCreateChannelModal();
     const { workspace, isFetching, isSuccess } = useGetWorkspaceById(workspaceId);
     const { openDM } = useOpenDM();
+    const { auth } = useAuth();
     
     const generalChannelId = workspace?.channels?.find((c) => c.name?.toLowerCase() === 'general')?._id || workspace?.channels?.[0]?._id;
 
@@ -69,17 +71,18 @@ export const WorkspacePanel = () => {
                 label="Direct messages"
                 onIconClick={() => {}}
             >
-                {workspace?.members?.map((item) => {
-                    return (
+                {(workspace?.members || [])
+                    .filter((m) => m?.memberId?._id !== auth?.user?._id)
+                    .filter((m, idx, arr) => arr.findIndex(x => x?.memberId?._id === m?.memberId?._id) === idx)
+                    .map((item) => (
                         <UserItem
                             key={item.memberId._id}
-                            label={item.memberId.username}
+                            label={item.role === 'admin' ? `${item.memberId.username} (Admin)` : item.memberId.username}
                             id={item.memberId._id}
                             image={item.memberId.avatar}
                             onClick={() => openDM(item.memberId._id)}
                         />
-                    );
-                })}
+                    ))}
 
                 
             </WorkspacePanelSection>

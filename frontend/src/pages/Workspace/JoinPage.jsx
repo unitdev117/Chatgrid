@@ -5,6 +5,7 @@ import VerificationInput from 'react-verification-input';
 import { Button } from '@/components/ui/button';
 import { useJoinWorkspaceRequest } from '@/hooks/apis/workspaces/useJoinWorkspace';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/context/useAuth';
 
 export const JoinPage = () => {
 
@@ -12,6 +13,7 @@ export const JoinPage = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const { toast } = useToast();
+    const { auth } = useAuth();
 
     const { joinWorkspaceMutation } = useJoinWorkspaceRequest(workspaceId);
 
@@ -37,10 +39,17 @@ export const JoinPage = () => {
     
     useEffect(() => {
         if (autoJoin === 'true' && codeFromLink) {
-            handleAddMemberToWorkspace(codeFromLink);
+            if (auth?.token) {
+                handleAddMemberToWorkspace(codeFromLink);
+            } else {
+                try {
+                    localStorage.setItem('pendingWorkspaceJoin', JSON.stringify({ workspaceId, joinCode: codeFromLink }));
+                } catch {}
+                navigate('/auth/signin');
+            }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [autoJoin, codeFromLink]);
+    }, [autoJoin, codeFromLink, auth?.token, workspaceId]);
 
     return (
         <div
