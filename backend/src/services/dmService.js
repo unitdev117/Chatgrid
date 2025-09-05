@@ -1,9 +1,12 @@
 import { StatusCodes } from 'http-status-codes';
 
+import { APP_LINK } from '../config/serverConfig.js';
+import { addEmailtoMailQueue } from '../producers/mailQueueProducer.js';
 import channelRepository from '../repositories/channelRepostiory.js';
 import inviteRepository from '../repositories/inviteRepository.js';
 import userRepository from '../repositories/userRepository.js';
 import workspaceRepository from '../repositories/workspaceRepository.js';
+import { workspaceInviteMail } from '../utils/common/mailObject.js';
 import ClientError from '../utils/errors/clientError.js';
 import { isUserMemberOfWorkspace } from './workspaceService.js';
 
@@ -247,6 +250,16 @@ export const createWorkspaceInviteService = async (workspaceId, senderId, email)
       receiverId: receiver._id,
       inviteType: 'workspace'
     });
+    // Send email with join link
+    try {
+      const inviteLink = `${APP_LINK}/workspaces/join/${workspace._id}?autoJoin=true&joinCode=${workspace.joinCode}`;
+      await addEmailtoMailQueue({
+        ...workspaceInviteMail({ workspace, sender: senderMember?.memberId || senderId, inviteLink }),
+        to: receiver.email
+      });
+    } catch (e) {
+      console.log('Failed to queue invite email', e);
+    }
     return invite;
   } catch (error) {
     console.log('createWorkspaceInviteService error', error);

@@ -9,6 +9,7 @@ export default function workspaceSocketHandlers(io, socket) {
       cb?.({ success: true, message: 'Joined workspace', data: workspaceId });
     } catch (e) {
       cb?.({ success: false, message: 'Failed to join workspace' });
+      console.log(e);
     }
   });
 }

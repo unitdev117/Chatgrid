@@ -3,7 +3,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import { listUserDMs } from '@/apis/dms';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/hooks/context/useAuth';
@@ -22,9 +21,8 @@ export const DMList = () => {
   const [query, setQuery] = useState('');
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    const base = (dms || []).filter((dm) => (dm.members || []).some((m) => m._id !== auth?.user?._id));
-    if (!q) return base;
-    return base.filter((dm) => {
+    if (!q) return dms || [];
+    return (dms || []).filter((dm) => {
       const other = (dm.members || []).find((m) => m._id !== auth?.user?._id);
       const label = (other?.username || dm.name || '').toLowerCase();
       return label.includes(q);

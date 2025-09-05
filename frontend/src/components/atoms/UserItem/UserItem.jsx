@@ -23,45 +23,65 @@ const userItemVariants = cva(
 export const UserItem = ({
     id,
     label = 'Member',
+    title, // string used for initials
+    suffix, // ReactNode to render after name (e.g., Admin)
+    rightContent, // ReactNode right-aligned (e.g., unread badge)
     image,
     variant,
     to,
-    onClick
+    onClick,
+    showActive = false
 }) => {
     console.log('incoming label', label);
     const { workspace } = useCurrentWorkspace();
 
     return (
         <Button
-            className={cn(userItemVariants({variant}))}
+            className={cn(userItemVariants({variant}), 'justify-between')}
             variant="transparent"
             size="sm"
             asChild={!!to}
             onClick={onClick}
         >
             {to ? (
-                <Link to={to}> 
-                    <Avatar>
-                        <AvatarImage src={image} className='rounded-md' />
-                        <AvatarFallback
-                            className='rounded-md bg-sky-500 text-white'
-                        >
-                            {label.charAt(0).toUpperCase()}
-                        </AvatarFallback>
-                    </Avatar>
+                <Link to={to} className='flex items-center gap-1.5 w-full'> 
+                    <div className='relative'>
+                        <Avatar>
+                            <AvatarImage src={image} className='rounded-md' />
+                            <AvatarFallback
+                                className='rounded-md bg-sky-500 text-white'
+                            >
+                                {(title || label).charAt(0).toUpperCase()}
+                            </AvatarFallback>
+                        </Avatar>
+                        {showActive && (
+                            <span className='absolute -bottom-0.5 -right-0.5 inline-block h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-[#1a1d21]' />
+                        )}
+                    </div>
                     <span className='text-sm truncate'>
-                        {label}
+                        {title || label}
+                        {suffix}
                     </span>
+                    <div className='ml-auto'>{rightContent}</div>
                 </Link>
             ) : (
-                <div className='flex items-center gap-1.5'>
-                    <Avatar>
-                        <AvatarImage src={image} className='rounded-md' />
-                        <AvatarFallback className='rounded-md bg-sky-500 text-white'>
-                            {label.charAt(0).toUpperCase()}
-                        </AvatarFallback>
-                    </Avatar>
-                    <span className='text-sm truncate'>{label}</span>
+                <div className='flex items-center gap-1.5 w-full'>
+                    <div className='relative'>
+                        <Avatar>
+                            <AvatarImage src={image} className='rounded-md' />
+                            <AvatarFallback className='rounded-md bg-sky-500 text-white'>
+                                {(title || label).charAt(0).toUpperCase()}
+                            </AvatarFallback>
+                        </Avatar>
+                        {showActive && (
+                            <span className='absolute -bottom-0.5 -right-0.5 inline-block h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-[#1a1d21]' />
+                        )}
+                    </div>
+                    <span className='text-sm truncate'>
+                        {title || label}
+                        {suffix}
+                    </span>
+                    <div className='ml-auto'>{rightContent}</div>
                 </div>
             )}
         </Button>

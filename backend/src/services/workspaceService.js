@@ -5,11 +5,11 @@ import { addEmailtoMailQueue } from '../producers/mailQueueProducer.js';
 import channelRepository from '../repositories/channelRepostiory.js';
 import userRepository from '../repositories/userRepository.js';
 import workspaceRepository from '../repositories/workspaceRepository.js';
-import { workspaceJoinMail } from '../utils/common/mailObject.js';
-import { getIO } from '../utils/socketEmitter.js';
 import { WORKSPACE_UPDATED_EVENT } from '../utils/common/eventConstants.js';
+import { workspaceJoinMail } from '../utils/common/mailObject.js';
 import ClientError from '../utils/errors/clientError.js';
 import ValidationError from '../utils/errors/validationError.js';
+import { getIO } from '../utils/socketEmitter.js';
 
 const isUserAdminOfWorkspace = (workspace, userId) => {
   console.log(workspace.members, userId);
@@ -280,7 +280,9 @@ export const addMemberToWorkspaceService = async (
         type: 'member-added',
         memberId
       });
-    } catch {}
+    } catch (error){
+      console.log(error)
+    }
     return response;
   } catch (error) {
     console.log('addMemberToWorkspaceService error', error);
@@ -368,7 +370,9 @@ export const joinWorkspaceService = async (workspaceId, joinCode, userId) => {
         type: 'member-added',
         memberId: userId
       });
-    } catch {}
+    } catch (error){
+      console.log(error);
+    }
     return updatedWorkspace;
   } catch (error) {
     console.log('joinWorkspaceService error', error);

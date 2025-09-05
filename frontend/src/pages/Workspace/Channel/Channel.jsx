@@ -41,9 +41,7 @@ export const Channel = () => {
 
     useEffect(() => {
         if(!isFetching && !isError) {
-            
             joinChannel(channelId);
-
         }
     }, [isFetching, isError, joinChannel, channelId]);
 

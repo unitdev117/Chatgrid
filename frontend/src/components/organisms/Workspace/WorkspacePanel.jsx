@@ -9,6 +9,7 @@ import { useGetWorkspaceById } from '@/hooks/apis/workspaces/useGetWorkspaceById
 import { useCreateChannelModal } from '@/hooks/context/useCreateChannelModal';
 import { useAuth } from '@/hooks/context/useAuth';
 import { useOpenDM } from '@/hooks/apis/dms/useOpenDM';
+ 
 
 export const WorkspacePanel = () => {
 
@@ -77,10 +78,12 @@ export const WorkspacePanel = () => {
                     .map((item) => (
                         <UserItem
                             key={item.memberId._id}
-                            label={item.role === 'admin' ? `${item.memberId.username} (Admin)` : item.memberId.username}
+                            title={item.memberId.username}
+                            suffix={item.role === 'admin' ? <span className='text-emerald-500 ml-1'>Admin</span> : null}
                             id={item.memberId._id}
                             image={item.memberId.avatar}
                             onClick={() => openDM(item.memberId._id)}
+                            showActive
                         />
                     ))}
 
